@@ -1,0 +1,175 @@
+<mt-sidebar>
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Pacientes</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item active">Gestão de Pacientes</li>
+            </ol>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    Tabela de pacientes
+                    <div class="row">
+                        <div class="col-4">
+                        </div>
+                        <div class="col-8 col-sm-6">
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-4" style="padding-left: 0px; margin-top: 2vh;">
+                                <button class="btn btn-primary btn-sm" style="margin-right: 1vh;" (click)="fetchPacientes()">
+                                    <img class="estyleMediumIcons" src="assets/images/icons/lista-de-itens.png">Listar
+                                </button>
+                                <button class="btn btn-primary btn-sm" style="margin-right: 1vh;" (click)="registerPacienteReset(); selectCreate()"
+                                    data-bs-toggle="modal" data-bs-target="#createMedicoModal" data-bs-toggle="modal" data-bs-target="#acaoPacienteModal">
+                                    <img class="estyleMediumIcons" src="assets/images/icons/botao-adicionar.png" >Criar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">CPF</th>
+                                    <th scope="col">Telefone</th>
+                                    <th scope="col">Nome do médico</th>
+                                    <th scope="col" colspan="2"> Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let paciente of pacientes">
+                                    <th scope="row">{{ paciente.id }}</th>
+                                    <td>{{ paciente.nome }}</td>
+                                    <td>{{ paciente.cpf }}</td>
+                                    <td>{{ paciente.telefone }}</td>
+                                    <td>{{ paciente.medico }}</td>
+                                    <td>
+                                        <button (click)="selectToDelete(paciente.id)" class="no-button-style">
+                                            <img src="assets/images/icons/trash.png" style="max-width: 38px;"
+                                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" alt="Deletar">
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="no-button-style" (click)="selectToEditPaciente(paciente)"
+                                        data-bs-toggle="modal" data-bs-target="#acaoPacienteModal">
+                                            <img src="assets/images/icons/pencil.png" style="max-width: 38px;" alt="Editar">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</mt-sidebar>
+
+<div class="modal fade" id="acaoPacienteModal" tabindex="-1" aria-labelledby="createMedicoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @if (actionSelected === 'create'){
+                    <h1 class="modal-title fs-5" id="createMedicoModalLabel">
+                        <img src="assets/images/icons/addPeople.png" class="estyleMediumIcons" alt="">Cadastrar
+                    </h1>
+                    }
+                    @else if (actionSelected === 'edit')
+                    {
+                    <h1 class="modal-title fs-5" id="editarMedicoModalLabel">
+                        <img src="assets/images/icons/Edit.png" class="estyleMediumIcons" alt="">Editar
+                    </h1>
+                    }
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid px-4">
+                        @if (actionSelected === 'create'){
+                        <p>Novo paciente </p>
+                        } @else if (actionSelected === 'edit')
+                        {
+                        <p>Editar pelo Id: {{ selectedPacienteId }}</p>
+                        }
+                        <form [formGroup]="AcaoPacienteForm">
+                            <mt-input-container [showTip]="false">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control custom-input" formControlName="nome" maxlength="255"
+                                        placeholder="Nome" name="Nome" id="nomeInput"
+                                        [ngClass]="{'is-invalid': AcaoPacienteForm.get('nome')?.invalid && AcaoPacienteForm.get('nome')?.touched}" />
+                                    <label for="inputName">Nome</label>
+                                </div>
+                            </mt-input-container>
+                            <mt-input-container [showTip]="false">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control custom-input" formControlName="cpf" placeholder="Cpf" maxlength="14"
+                                        (input)="formatCPF($event)" name="cpf" id="cpfInput"
+                                        [ngClass]="{'is-invalid': AcaoPacienteForm.get('cpf')?.invalid && AcaoPacienteForm.get('cpf')?.touched}" />
+                                    <label for="inputCpf">CPF</label>
+                                </div>
+                            </mt-input-container>
+                            <mt-input-container [showTip]="false">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control custom-input" formControlName="telefone"
+                                        inputmode="uppercase" placeholder="telefone" name="telefone" id="ufCrmInput" maxlength="15"
+                                        [ngClass]="{'is-invalid': AcaoPacienteForm.get('telefone')?.invalid && AcaoPacienteForm.get('telefone')?.touched}"
+                                        (input)="formatTelefone($event)"/>
+                                    <label for="inputTelefone">Telefone</label>
+                                </div>
+                            </mt-input-container>
+                            <mt-input-container [showTip]="false">
+                                <div class="form-floating mb-3">
+                                    <input class="form-control custom-input" formControlName="medicoId" maxlength="36"
+                                        placeholder="Medico" name="medico" id="medicoInput"
+                                        [ngClass]="{'is-invalid': AcaoPacienteForm.get('medicoId')?.invalid && AcaoPacienteForm.get('medicoId')?.touched}" />
+                                    <label for="inputMedico">Id do Médico</label>
+                                </div>
+                            </mt-input-container>
+                        </form>
+                        @if (actionSelected === 'create'){
+                        <div>
+                            <button class="btn btn-primary btn-sm" style="margin-right: 1vh;"
+                                [disabled]="AcaoPacienteForm.invalid" (click)="create()"> Cadastrar
+                            </button><span style="color: red;">{{ messageCreate }}</span>
+                        </div>
+                        }
+                        @else if (actionSelected === 'edit')
+                        {
+                        <div>
+                            <button class="btn btn-primary btn-sm" style="margin-right: 1vh;"
+                                [disabled]="AcaoPacienteForm.invalid" (click)="editPaciente()">Editar
+                            </button><span style="color: red;">{{ messageEdit }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">Deletar</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja deletar o paciente selecionado?</p>
+                    <p>ID: {{ selectToDeleteId }}</p>
+                    <p>{{messageDelete}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-danger" (click)="deletePaciente()">Deletar</button>
+                </div>
+            </div>
+        </div>
+    </div>

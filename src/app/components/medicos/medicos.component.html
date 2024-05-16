@@ -1,130 +1,225 @@
-<div class="container-fluid px-4">
-    <h1 class="mt-4" style="margin-left: 12px;">Médicos</h1>
-    <ol class="breadcrumb mb-4" style="margin-left: 12px;">
-        <li class="breadcrumb-item active">Gestão de Médicos</li>
-    </ol>
-    <div>
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <img src="https://cdn-icons-png.flaticon.com/128/3394/3394625.png" style="max-width: 17px;" alt="">
-                            Cadastrar
+<mt-sidebar>
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Médicos</h1>
+            <ol class="breadcrumb mb-4">
+                <li class="breadcrumb-item active">Gestão de Médicos</li>
+            </ol>
+            <div class="card mb-4">
+                <div class="card-header" style="padding-bottom: 0px;">
+                    <i class="fas fa-table me-1"></i>
+                    Tabela de médicos
+                    <div class="row">
+                        <div class="col-4">
                         </div>
-                        <div class="container-fluid px-4">
-                            <br>
-                            <p>Novo médico </p>
-                            <p class="mb-3">Nome:</p>
-                            <input type="text" class="form-control mb-3" id="nomeInput">
-                            <p class="mb-3">CRM:</p>
-                            <input type="text" class="form-control mb-3" id="crmInput">
-                            <p class="mb-3">UF CRM:</p>
-                            <input type="text" class="form-control mb-3" id="ufCrmInput">
-                            <p class="mb-3">Especialidade:</p>
-                            <input type="text" class="form-control mb-3" id="especialidadeInput">
-                            <p><a class="btn btn-primary btn-sm" style="margin-right: 1vh;" (click)="cadastrarMedico()">
-                                    Cadastrar
-                                </a><span style="color: red;">{{ messageCreate }}</span></p>
+                        <div class="col-8 col-sm-6">
+                            <p style="padding-top: 3px; font-size: smaller; margin-left: 1vh; margin-bottom: -2px;">
+                                <strong>Filtrar por:</strong>
+                            </p>
                         </div>
                     </div>
-                </div>
-                <div class="col-xl-6" >
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <img src="https://cdn-icons-png.flaticon.com/512/6269/6269505.png" style="max-width: 17px;" alt="">
-                            Editar
-                        </div>
-                        <div class="container-fluid px-4">
-                            <br>
-                            <p>Editar pelo Id: {{ selectedMedico }}</p>
-                            <p class="mb-3">Nome:</p>
-                            <input type="text" class="form-control mb-3" id="editNome">
-                            <p class="mb-3">CRM:</p>
-                            <input type="text" class="form-control mb-3" id="editCrm">
-                            <p class="mb-3">UF CRM:</p>
-                            <input type="text" class="form-control mb-3" id="editUfCrm">
-                            <p class="mb-3">Especialidade:</p>
-                            <input type="text" class="form-control mb-3" id="editEspecialidade">
-                            <p><a class="btn btn-primary btn-sm" style="margin-right: 1vh;" (click)="updateMedico()">
-                                    Editar
-                                </a><span style="color: red;">{{ messageEdit }}</span></p>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-4" style="padding-left: 0px;">
+                                <button class="btn btn-primary btn-sm" style="margin-right: 1vh;"
+                                    (click)="fetchMedicos(nomeFilter, ufFilter)">
+                                    <img class="estyleMediumIcons"
+                                        src="assets/images/icons/lista-de-itens.png">Listar
+                                </button>
+                                <button class="btn btn-primary btn-sm" style="margin-right: 1vh;"
+                                    (click)="registerMedicoReset(); activeCreate()" data-bs-toggle="modal"
+                                    data-bs-target="#acaoMedicoModal">
+                                    <img class="estyleMediumIcons"
+                                        src="assets/images/icons/botao-adicionar.png">Criar
+                                </button>
+                            </div>
+                            <div class="col-8">
+                                <div class="input-group input-group-sm mb-3" style="max-width: 400px;">
+                                    <span class="input-group-text" id="basic-addon1">UF</span>
+                                    <input type="text" class="form-control" id="ufInput" [(ngModel)]="ufFilter" maxlength="2"
+                                        style="margin-right: 1vh; max-width: 45px;" aria-label="UF"
+                                        aria-describedby="basic-addon1">
+                                    <span class="input-group-text" id="basic-addon1">Nome</span>
+                                    <input type="text" class="form-control" id="nomeInputFilter"
+                                        [(ngModel)]="nomeFilter" placeholder="Digite o Nome" aria-label="Nome"
+                                        aria-describedby="basic-addon1" style="margin-right: 1vh;">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">CRM</th>
+                                    <th scope="col">UF</th>
+                                    <th scope="col">Especialidade</th>
+                                    <th scope="col" colspan="2"> Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let medico of medicos">
+                                    <th scope="row">{{ medico.id }}</th>
+                                    <td>{{ medico.nome }}</td>
+                                    <td>{{ medico.crm }}</td>
+                                    <td>{{ medico.ufCrm }}</td>
+                                    <td>{{ medico.especialidade }}</td>
+                                    <td>
+                                        <button (click)="selectToDelete(medico.id)" class="no-button-style">
+                                            <img src="assets/images/icons/trash.png" style="max-width: 38px;"
+                                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" alt="Deletar">
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="no-button-style" data-bs-toggle="modal"
+                                            data-bs-target="#acaoMedicoModal"
+                                            (click)="selectToEditMedico(medico)"
+                                            data-bs-toggle="modal" data-bs-target="#acaoMedicoModal">
+                                            <img src="assets/images/icons/pencil.png" style="max-width: 38px;"
+                                                alt="Editar">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="col-8 col-sm-6">
-                        <p style="padding-top: 3px; font-size: smaller; margin-right: 1vh; margin-bottom: -2px;">
-                            <strong>Filtrar por:</strong>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-4" style="padding-left: 0px;">
-                        <a class="btn btn-primary btn-sm" style="margin-right: 1vh;" (click)="fetchMedicos()">Listar
-                            médicos</a>
-                    </div>
-                    <div class="col-8">
-                        <div class="input-group input-group-sm mb-3" style="width: 500px;">
-                            <span class="input-group-text" id="basic-addon1">UF</span>
-                            <input type="text" class="form-control" id="ufInput" [(ngModel)]="ufFilter"
-                                style="margin-right: 1vh; max-width: 45px;" aria-label="UF"
-                                aria-describedby="basic-addon1">
-                            <span class="input-group-text" id="basic-addon1">Nome</span>
-                            <input type="text" class="form-control" id="nomeInputFilter" [(ngModel)]="nomeFilter"
-                                placeholder="Digite o Nome" aria-label="Nome" aria-describedby="basic-addon1"
-                                style="margin-right: 1vh;">
-                            <a class="btn btn-primary btn-sm" style="margin-right: 7px;" (click)="fetchMedicos(nomeFilter, ufFilter)">Atualizar</a>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
+    </main>
+</mt-sidebar>
 
-        <div class="card mb-4" style="margin-left: 12px; margin-right: 12px;">
-            <div class="card-header">
-                <i class="fas fa-table me-1"></i>
-                Tabela de médicos
+
+<div class="modal fade" id="acaoMedicoModal" tabindex="-1" aria-labelledby="acaoMedicoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                @if (actionSelected === 'create'){
+                <h1 class="modal-title fs-5" id="acaoMedicoModalLabel">
+                    <img src="assets/images/icons/addPeople.png" class="estyleMediumIcons" alt="">Cadastrar
+                </h1>
+                }
+                @else if (actionSelected === 'edit')
+                {
+                <h1 class="modal-title fs-5" id="editarMedicoModalLabel">
+                    <img src="assets/images/icons/Edit.png" class="estyleMediumIcons" alt="">Editar
+                </h1>
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="card-body">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">CRM</th>
-                            <th scope="col">UF</th>
-                            <th scope="col">Especialidade</th>
-                            <th scope="col">Deletar</th>
-                            <th scope="col">Editar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let medico of medicos">
-                            <th scope="row">{{ medico.id }}</th>
-                            <td>{{ medico.nome }}</td>
-                            <td>{{ medico.crm }}</td>
-                            <td>{{ medico.ufCrm }}</td>
-                            <td>{{ medico.especialidade }}</td>
-                            <td>
-                                <a (click)="deleteMedico(medico.id)" style="cursor: pointer;">
-                                    <img src="https://cdn-icons-png.flaticon.com/128/6711/6711573.png" style="max-width: 38px;" alt="Deletar">
-                                </a>
-                            </td>
-                            <td>
-                                <a (click)="selectMedico(medico.id, medico.crm, medico.nome, medico.ufCrm, medico.especialidade)" style="cursor: pointer;">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/6841/6841733.png" style="max-width: 38px;" alt="Editar">
-                                </a>
-                            </td>
-                            
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="modal-body">
+                <div class="container-fluid px-4">
+                    @if (actionSelected === 'create'){
+                    <p>Novo médico </p>
+                    } @else if (actionSelected === 'edit')
+                    {
+                    <p>Editar pelo Id: {{ selectedMedicoId }}</p>
+                    }
+                    <form [formGroup]="AcaoMedicoForm">
+                        <mt-input-container [showTip]="false">
+                            <div class="form-floating mb-3">
+                                <input class="form-control custom-input" formControlName="nome" maxlength="255"
+                                    placeholder="Nome" name="Nome" id="nomeInput"
+                                    [ngClass]="{'is-invalid': AcaoMedicoForm.get('nome')?.invalid && AcaoMedicoForm.get('nome')?.touched}" />
+                                <label for="inputPassword">Nome</label>
+                            </div>
+                        </mt-input-container>
+                        <mt-input-container [showTip]="false">
+                            <div class="form-floating mb-3">
+                                <input class="form-control custom-input" formControlName="crm" placeholder="Crm"
+                                    name="Crm" id="crmInput"
+                                    [ngClass]="{'is-invalid': AcaoMedicoForm.get('crm')?.invalid && AcaoMedicoForm.get('crm')?.touched}" />
+                                <label for="inputCrm">CRM</label>
+                            </div>
+                        </mt-input-container>
+                        <mt-input-container [showTip]="false">
+                            <div class="input-group mb-3">
+                                <label class="input-group-text" for="inputGroupSelect01">UF</label>
+                                <select class="form-select" id="inputGroupSelect01" formControlName="ufCrm"
+                                [ngClass]="{'is-invalid': AcaoMedicoForm.get('ufCrm')?.invalid && AcaoMedicoForm.get('ufCrm')?.touched}">
+                                    <option selected>Escolha...</option>
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                            </div>
+                        </mt-input-container>
+                        <mt-input-container [showTip]="false">
+                            <div class="form-floating mb-3">
+                                <input class="form-control custom-input" formControlName="especialidade" maxlength="255"
+                                    placeholder="Especialidade" name="especialidade" id="especialidadeInput"
+                                    [ngClass]="{'is-invalid': AcaoMedicoForm.get('especialidade')?.invalid && AcaoMedicoForm.get('especialidade')?.touched}" />
+                                <label for="inputEspecialidade">Especialidade</label>
+                            </div>
+                        </mt-input-container>
+                    </form>
+                    @if (actionSelected === 'create'){
+                    <div>
+                        <button class="btn btn-primary btn-sm" style="margin-right: 1vh;"
+                            [disabled]="AcaoMedicoForm.invalid" (click)="create()"> Cadastrar
+                        </button><span style="color: red;">{{ messageCreate }}</span>
+                    </div>
+                    }
+                    @else if (actionSelected === 'edit')
+                    {
+                    <div>
+                        <button class="btn btn-primary btn-sm" style="margin-right: 1vh;"
+                            [disabled]="AcaoMedicoForm.invalid" (click)="editMedico()">Editar
+                        </button><span style="color: red;">{{ messageEdit }}</span>
+                    </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">Deletar</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja deletar o médico selecionado?</p>
+                <p>ID: {{ selectToDeleteId }}</p>
+                <p>{{messageDelete}}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-danger" (click)="deleteMedico()">Deletar</button>
+            </div>
+        </div>
+    </div>
+</div>
